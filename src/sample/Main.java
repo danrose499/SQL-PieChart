@@ -28,7 +28,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            getConnection(databaseName);
+            connection = getConnection(databaseName);
             dropTables(connection);
             createTables(connection);
             populate(connection);
@@ -61,12 +61,12 @@ public class Main extends Application {
         CSc22000.drawPieChart(CV.getGraphicsContext2D());
         return CV;
     }
-    public static void getConnection(String databaseName) throws SQLException, ClassNotFoundException {
+    public static Connection getConnection(String databaseName) throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/" + databaseName;
         String username = "root";
         String password = "Dolfin.499";
-        connection = DriverManager.getConnection(url, username, password);
+        return DriverManager.getConnection(url, username, password);
     }
     public static void dropTables(Connection connection) throws SQLException {
         //Drops Tables:
