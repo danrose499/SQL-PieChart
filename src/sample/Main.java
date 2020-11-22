@@ -1,6 +1,5 @@
 package sample;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -27,12 +26,14 @@ public class Main extends Application {
     static String databaseName = "Student";
 
     @Override
-    public void start(Stage primaryStage) /*throws Exception*/ {
+    public void start(Stage primaryStage) {
         try {
             getConnection(databaseName);
             dropTables(connection);
             createTables(connection);
             populate(connection);
+            String tableUpdate = "UPDATE Classes SET year = \"2020\", semester = \"Fall\" where course = 1 AND student = 9;";
+            updateTable(connection, tableUpdate);
             Map<Character, Integer> grades = getGrades(connection);
 
             int cWidth = 600, cHeight = 600;
@@ -47,11 +48,14 @@ public class Main extends Application {
             Scene SC = new Scene(BP, cWidth + 200, cHeight + 200);
             primaryStage.setScene(SC);
             primaryStage.show();
+
+            connection.close();
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
-    private Canvas addCanvas(int cWidth, int cHeight, Map<Character, Integer> grades) throws IOException {
+    private Canvas addCanvas(int cWidth, int cHeight, Map<Character, Integer> grades) {
         Canvas CV = new Canvas(cWidth, cHeight);
         CSc22000 = new SQLHistogram(grades);
         CSc22000.drawPieChart(CV.getGraphicsContext2D());
@@ -72,6 +76,9 @@ public class Main extends Application {
         dropStudents.executeUpdate();
         dropCourses.executeUpdate();
         dropClasses.executeUpdate();
+        dropStudents.close();
+        dropCourses.close();
+        dropClasses.close();
     }
     public static void createTables(Connection connection) throws SQLException {
         //Creates Tables:
@@ -81,6 +88,9 @@ public class Main extends Application {
         createStudents.executeUpdate();
         createCourses.executeUpdate();
         createClasses.executeUpdate();
+        createStudents.close();
+        createCourses.close();
+        createClasses.close();
     }
     public static void populate(Connection connection) throws SQLException {
         //Populates Tables - Declares prepared statements for each table:
@@ -90,349 +100,75 @@ public class Main extends Application {
         PreparedStatement stuStatement = connection.prepareStatement(insertStudent);
         PreparedStatement courseStatement = connection.prepareStatement(insertCourse);
         PreparedStatement classStatement = connection.prepareStatement(insertClass);
-        //Fill Students:
-        //Student 1
-        stuStatement.setString(1, "Daniel");
-        stuStatement.setString(2, "Rosenthal");
-        stuStatement.setString(3, "drosent000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        stuStatement.executeUpdate();
-        //Student 2
-        stuStatement.setString(1, "Bruce");
-        stuStatement.setString(2, "Wayne");
-        stuStatement.setString(3, "bwayne000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        stuStatement.executeUpdate();
-        //Student 3
-        stuStatement.setString(1, "Barbara");
-        stuStatement.setString(2, "Gordon");
-        stuStatement.setString(3, "bgordon000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        stuStatement.executeUpdate();
-        //Student 4
-        stuStatement.setString(1, "Jay");
-        stuStatement.setString(2, "Harvey");
-        stuStatement.setString(3, "jharvey000@citymail.cuny.edu");
-        stuStatement.setString(4, "U");
-        stuStatement.executeUpdate();
-        //Student 5
-        stuStatement.setString(1, "Pamela");
-        stuStatement.setString(2, "Gold");
-        stuStatement.setString(3, "pgold000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        //Student 6
-        stuStatement.setString(1, "Steve");
-        stuStatement.setString(2, "Jone");
-        stuStatement.setString(3, "sjones000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        //Student 7
-        stuStatement.setString(1, "Jack");
-        stuStatement.setString(2, "Ryan");
-        stuStatement.setString(3, "jryan000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        //Student 8
-        stuStatement.setString(1, "Selena");
-        stuStatement.setString(2, "Martinez");
-        stuStatement.setString(3, "smartinez000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        //Student 9
-        stuStatement.setString(1, "Jordana");
-        stuStatement.setString(2, "Gomez");
-        stuStatement.setString(3, "sgomez000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        //Student 10
-        stuStatement.setString(1, "Dave");
-        stuStatement.setString(2, "Stock");
-        stuStatement.setString(3, "dstock000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        //Student 11
-        stuStatement.setString(1, "Jules");
-        stuStatement.setString(2, "Olen");
-        stuStatement.setString(3, "jolen000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        //Student 12
-        stuStatement.setString(1, "Jack");
-        stuStatement.setString(2, "Ryan");
-        stuStatement.setString(3, "jryan001@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        //Student 13
-        stuStatement.setString(1, "Jordana");
-        stuStatement.setString(2, "Smith");
-        stuStatement.setString(3, "jsmith000@citymail.cuny.edu");
-        stuStatement.setString(4, "F");
-        //Student 14
-        stuStatement.setString(1, "Rick");
-        stuStatement.setString(2, "Roll");
-        stuStatement.setString(3, "rroll000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        //Student 15
-        stuStatement.setString(1, "Trey");
-        stuStatement.setString(2, "Anastasio");
-        stuStatement.setString(3, "aanastasio000@citymail.cuny.edu");
-        stuStatement.setString(4, "M");
-        stuStatement.executeUpdate();
+        //Fills Students:
+        String[] gender = {"M", "F"};
+        for(int i = 0; i < 101; i++){
+            stuStatement.setString(1, "Alex_" + i);
+            stuStatement.setString(2, "Smith_" + i);
+            stuStatement.setString(3, "alex.smith_" + i + "@CityMail.cuny.edu");
+            stuStatement.setString(4, gender[i%2]);
+            stuStatement.executeUpdate();
+        }
         //Fill Courses:
-        //Course 1
-        courseStatement.setString(1, "22000");
-        courseStatement.setString(2, "CSc");
-        courseStatement.executeUpdate();
-        //Course 2
-        courseStatement.setString(1, "33000");
-        courseStatement.setString(2, "EE");
-        courseStatement.executeUpdate();
-        //Course 3
-        courseStatement.setString(1, "24100");
-        courseStatement.setString(2, "EE");
-        courseStatement.executeUpdate();
-        //Course 4
-        courseStatement.setString(1, "13100");
-        courseStatement.setString(2, "THTR");
-        courseStatement.executeUpdate();
-        //Course 5
-        courseStatement.setString(1, "47200");
-        courseStatement.setString(2, "CSc");
-        courseStatement.executeUpdate();
-        //Fill Classes:
-        //Class 1
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 1);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 2
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 2);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 3
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 3);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "C");
-        classStatement.executeUpdate();
-        //Class 4
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 4);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "D");
-        classStatement.executeUpdate();
-        //Class 5
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 5);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "F");
-        classStatement.executeUpdate();
-        //Class 6
-        classStatement.setInt(1, 2);
-        classStatement.setInt(2, 1);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "W");
-        classStatement.executeUpdate();
-        //Class 7
-        classStatement.setInt(1, 2);
-        classStatement.setInt(2, 2);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 8
-        classStatement.setInt(1, 3);
-        classStatement.setInt(2, 3);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "C");
-        classStatement.executeUpdate();
-        //Class 9
-        classStatement.setInt(1, 3);
-        classStatement.setInt(2, 4);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "C");
-        classStatement.executeUpdate();
-        //Class 10
-        classStatement.setInt(1, 3);
-        classStatement.setInt(2, 5);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 11
-        classStatement.setInt(1, 4);
-        classStatement.setInt(2, 1);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 12
-        classStatement.setInt(1, 4);
-        classStatement.setInt(2, 2);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 13
-        classStatement.setInt(1, 5);
-        classStatement.setInt(2, 3);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 14
-        classStatement.setInt(1, 5);
-        classStatement.setInt(2, 4);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "C");
-        classStatement.executeUpdate();
-        //Class 15
-        classStatement.setInt(1, 5);
-        classStatement.setInt(2, 5);
-        classStatement.setInt(3, 3);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "W");
-        classStatement.executeUpdate();
-        //Class 16
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 15);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 17
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 14);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "D");
-        classStatement.executeUpdate();
-        //Class 18
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 13);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 19
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 12);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 20
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 11);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 21
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 10);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "C");
-        classStatement.executeUpdate();
-        //Class 22
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 9);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 23
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 8);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 24
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 7);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 25
-        classStatement.setInt(1, 1);
-        classStatement.setInt(2, 6);
-        classStatement.setInt(3, 2);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "W");
-        classStatement.executeUpdate();
-        //Class 26
-        classStatement.setInt(1, 2);
-        classStatement.setInt(2, 15);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
-        //Class 27
-        classStatement.setInt(1, 3);
-        classStatement.setInt(2, 10);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 28
-        classStatement.setInt(1, 4);
-        classStatement.setInt(2, 9);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "F");
-        classStatement.executeUpdate();
-        //Class 29
-        classStatement.setInt(1, 5);
-        classStatement.setInt(2, 8);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "B");
-        classStatement.executeUpdate();
-        //Class 30
-        classStatement.setInt(1, 2);
-        classStatement.setInt(2, 7);
-        classStatement.setInt(3, 1);
-        classStatement.setInt(4, 2020);
-        classStatement.setString(5, "Fall");
-        classStatement.setString(6, "A");
-        classStatement.executeUpdate();
+        for(int i = 22000; i < 22500; i+=100){
+            courseStatement.setString(1, String.valueOf(i));
+            courseStatement.setString(2, "CSc");
+            courseStatement.executeUpdate();
+            courseStatement.setString(1, String.valueOf(i));
+            courseStatement.setString(2, "EE");
+            courseStatement.executeUpdate();
+            courseStatement.setString(1, String.valueOf(i));
+            courseStatement.setString(2, "THTR");
+            courseStatement.executeUpdate();
+        }
+        //Fills Classes:
+        String[] grades = {"A", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "C", "C", "C", "D", "D", "F", "W"}; //18 grades
+        //Fall 2020
+        for(int i = 0; i < 100; i++){
+            classStatement.setInt(1, (i%15+1));
+            classStatement.setInt(2, (i%101+1));
+            classStatement.setInt(3, (i%4));
+            classStatement.setInt(4, 2020);
+            classStatement.setString(5, "Fall");
+            classStatement.setString(6, grades[i%18]);
+            classStatement.executeUpdate();
+        }
+        for(int i = 0; i < 100; i++){
+            classStatement.setInt(1, (i%15+1));
+            classStatement.setInt(2, ((i+1)%101+1));
+            classStatement.setInt(3, (i%4));
+            classStatement.setInt(4, 2020);
+            classStatement.setString(5, "Fall");
+            classStatement.setString(6, grades[(i+1)%18]);
+            classStatement.executeUpdate();
+        }
+        for(int i = 0; i < 100; i++){
+            classStatement.setInt(1, (i%15+1));
+            classStatement.setInt(2, ((i+2)%101+1));
+            classStatement.setInt(3, (i%4));
+            classStatement.setInt(4, 2020);
+            classStatement.setString(5, "Fall");
+            classStatement.setString(6, grades[(i+2)%18]);
+            classStatement.executeUpdate();
+        }
+        //Spring 2021
+        for(int i = 184; i < 368; i++){
+            classStatement.setInt(1, (i%15+1));
+            classStatement.setInt(2, (i%101+1));
+            classStatement.setInt(3, (i%4));
+            classStatement.setInt(4, 2021);
+            classStatement.setString(5, "Spring");
+            classStatement.setString(6, grades[i%18]);
+            classStatement.executeUpdate();
+        }
+        stuStatement.close();
+        courseStatement.close();
+        classStatement.close();
+    }
+    public static void updateTable(Connection connection, String SQLQuery) throws SQLException {
+        PreparedStatement updateQuery = connection.prepareStatement(SQLQuery);
+        updateQuery.executeUpdate();
+        updateQuery.close();
     }
     public static Map<Character, Integer> getGrades(Connection connection) throws SQLException {
         String gradeQuery = "SELECT grade FROM Classes WHERE course = 1 AND semester = \"Fall\" AND year = 2020;";
@@ -448,6 +184,7 @@ public class Main extends Application {
             char gradeKey = currGrade.charAt(0);
             grades.replace(gradeKey, grades.get(gradeKey) + 1);
         }
+        searchGrades.close();
         return grades;
     }
     public static void main(String[] args) {
