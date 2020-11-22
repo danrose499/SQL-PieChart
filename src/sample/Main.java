@@ -19,9 +19,6 @@ import javafx.scene.canvas.Canvas;
 
 public class Main extends Application {
     Canvas CV;
-    String className = "CSc22000";
-    SQLHistogram CSc22000;
-
     static Connection connection = null;
     static String databaseName = "Student";
 
@@ -41,7 +38,7 @@ public class Main extends Application {
             BorderPane BP = new BorderPane();
             CV = addCanvas(cWidth, cHeight, grades);
             BP.setCenter(CV);
-            Text topText = new Text("Displaying Grade Frequencies of: " + className);
+            Text topText = new Text("Displaying Grade Frequencies of: CSc 22000");
             BorderPane.setAlignment(topText, Pos.TOP_CENTER);
             BP.setStyle("-fx-padding: 10;");
             BP.setTop(topText);
@@ -57,7 +54,7 @@ public class Main extends Application {
     }
     private Canvas addCanvas(int cWidth, int cHeight, Map<Character, Integer> grades) {
         Canvas CV = new Canvas(cWidth, cHeight);
-        CSc22000 = new SQLHistogram(grades);
+        SQLHistogram CSc22000 = new SQLHistogram(grades);
         CSc22000.drawPieChart(CV.getGraphicsContext2D());
         return CV;
     }
@@ -82,9 +79,9 @@ public class Main extends Application {
     }
     public static void createTables(Connection connection) throws SQLException {
         //Creates Tables:
-        PreparedStatement createStudents = connection.prepareStatement("CREATE TABLE Students(studentID int unsigned NOT NULL AUTO_INCREMENT, firstName varchar(255), lastName varchar(255), email varchar(255), sex varchar(255), PRIMARY KEY(studentID))");
-        PreparedStatement createCourses = connection.prepareStatement("CREATE TABLE Courses(courseID int unsigned NOT NULL AUTO_INCREMENT, courseTitle varchar(255), department varchar(255), PRIMARY KEY(courseID))");
-        PreparedStatement createClasses = connection.prepareStatement("CREATE TABLE Classes(course int unsigned NOT NULL REFERENCES Courses(courseID), student int unsigned NOT NULL REFERENCES Students(studentID), sectionNo int unsigned NOT NULL, year int unsigned, semester varchar(255), grade varchar(255), PRIMARY KEY(course, student, sectionNo))");
+        PreparedStatement createStudents = connection.prepareStatement("CREATE TABLE Students(studentID int unsigned NOT NULL AUTO_INCREMENT, firstName varchar(255), lastName varchar(255), email varchar(255), sex varchar(1), PRIMARY KEY(studentID))");
+        PreparedStatement createCourses = connection.prepareStatement("CREATE TABLE Courses(courseID int unsigned NOT NULL AUTO_INCREMENT, courseTitle varchar(255), department varchar(5), PRIMARY KEY(courseID))");
+        PreparedStatement createClasses = connection.prepareStatement("CREATE TABLE Classes(course int unsigned NOT NULL REFERENCES Courses(courseID), student int unsigned NOT NULL REFERENCES Students(studentID), sectionNo int unsigned NOT NULL, year int unsigned, semester varchar(6), grade varchar(4), PRIMARY KEY(course, student, sectionNo))");
         createStudents.executeUpdate();
         createCourses.executeUpdate();
         createClasses.executeUpdate();
@@ -124,7 +121,7 @@ public class Main extends Application {
         //Fills Classes:
         String[] grades = {"A", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "C", "C", "C", "D", "D", "F", "W"}; //18 grades
         //Fall 2020
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 101; i++){
             classStatement.setInt(1, (i%15+1));
             classStatement.setInt(2, (i%101+1));
             classStatement.setInt(3, (i%4));
@@ -133,7 +130,7 @@ public class Main extends Application {
             classStatement.setString(6, grades[i%18]);
             classStatement.executeUpdate();
         }
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 101; i++){
             classStatement.setInt(1, (i%15+1));
             classStatement.setInt(2, ((i+1)%101+1));
             classStatement.setInt(3, (i%4));
@@ -142,7 +139,7 @@ public class Main extends Application {
             classStatement.setString(6, grades[(i+1)%18]);
             classStatement.executeUpdate();
         }
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 101; i++){
             classStatement.setInt(1, (i%15+1));
             classStatement.setInt(2, ((i+2)%101+1));
             classStatement.setInt(3, (i%4));
@@ -152,9 +149,9 @@ public class Main extends Application {
             classStatement.executeUpdate();
         }
         //Spring 2021
-        for(int i = 184; i < 368; i++){
+        for(int i = 0; i < 101; i++){
             classStatement.setInt(1, (i%15+1));
-            classStatement.setInt(2, (i%101+1));
+            classStatement.setInt(2, ((i+3)%101+1));
             classStatement.setInt(3, (i%4));
             classStatement.setInt(4, 2021);
             classStatement.setString(5, "Spring");
@@ -185,6 +182,7 @@ public class Main extends Application {
             grades.replace(gradeKey, grades.get(gradeKey) + 1);
         }
         searchGrades.close();
+        RS.close();
         return grades;
     }
     public static void main(String[] args) {
