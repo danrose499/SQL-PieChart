@@ -79,9 +79,9 @@ public class Main extends Application {
     }
     public static void createTables(Connection connection) throws SQLException {
         //Creates Tables:
-        PreparedStatement createStudents = connection.prepareStatement("CREATE TABLE Students(studentID int unsigned NOT NULL AUTO_INCREMENT, firstName varchar(255), lastName varchar(255), email varchar(255), sex varchar(1), PRIMARY KEY(studentID))");
+        PreparedStatement createStudents = connection.prepareStatement("CREATE TABLE Students(studentID int unsigned NOT NULL AUTO_INCREMENT, firstName varchar(255), lastName varchar(255), email varchar(255), sex varchar(1) CHECK (sex = \"M\" OR sex = \"F\" OR sex = \"U\"), PRIMARY KEY(studentID))");
         PreparedStatement createCourses = connection.prepareStatement("CREATE TABLE Courses(courseID int unsigned NOT NULL AUTO_INCREMENT, courseTitle varchar(255), department varchar(5), PRIMARY KEY(courseID))");
-        PreparedStatement createClasses = connection.prepareStatement("CREATE TABLE Classes(course int unsigned NOT NULL REFERENCES Courses(courseID), student int unsigned NOT NULL REFERENCES Students(studentID), sectionNo int unsigned NOT NULL, year int unsigned, semester varchar(6), grade varchar(4), PRIMARY KEY(course, student, sectionNo))");
+        PreparedStatement createClasses = connection.prepareStatement("CREATE TABLE Classes(course int unsigned NOT NULL REFERENCES Courses(courseID), student int unsigned NOT NULL REFERENCES Students(studentID), sectionNo int unsigned NOT NULL, year int unsigned, semester varchar(6), grade varchar(1) CHECK (grade = \"A\" or grade = \"B\" or grade = \"C\" or grade = \"D\" or grade = \"F\" or grade = \"W\"), PRIMARY KEY(course, student, sectionNo))");
         createStudents.executeUpdate();
         createCourses.executeUpdate();
         createClasses.executeUpdate();
