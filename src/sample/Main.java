@@ -55,14 +55,14 @@ public class Main extends Application {
     private Canvas addCanvas(int cWidth, int cHeight, Map<Character, Integer> grades) {
         Canvas CV = new Canvas(cWidth, cHeight);
         SQLHistogram CSc22000 = new SQLHistogram(grades);
-        CSc22000.drawPieChart(CV.getGraphicsContext2D());
+        CSc22000.drawPieChart(CV);
         return CV;
     }
     public static Connection getConnection(String databaseName) throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/" + databaseName;
         String username = "root";
-        String password = "secret";
+        String password = "Dolfin.499";
         return DriverManager.getConnection(url, username, password);
     }
     public static void dropTables(Connection connection) throws SQLException {
