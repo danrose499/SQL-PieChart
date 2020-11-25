@@ -1,6 +1,6 @@
 package sample;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import java.util.Map;
 
 public class SQLHistogram {
@@ -16,12 +16,12 @@ public class SQLHistogram {
         totalStudents = n;
     }
 
-    public void drawPieChart(GraphicsContext GC){
-        int cWidth = (int) GC.getCanvas().getWidth();
-        int cHeight = (int) GC.getCanvas().getHeight();
+    public void drawPieChart(Canvas CV){
+        int cWidth = (int) CV.getWidth();
+        int cHeight = (int) CV.getHeight();
         double d = (3.0 * (Math.min(cWidth, cHeight) / 4.0))-50;
         MyPoint arcPoint = new MyPoint(cWidth / 2 - (int) d / 2, cHeight / 2 - (int) d / 2);
         PieChart charChart = new PieChart(arcPoint, d);
-        charChart.draw(GC, totalStudents, 6, grades);
+        charChart.draw(CV.getGraphicsContext2D(), totalStudents, 6, grades);
     }
 }
