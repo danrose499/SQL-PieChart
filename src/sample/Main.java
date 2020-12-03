@@ -62,7 +62,7 @@ public class Main extends Application {
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/" + databaseName;
         String username = "root";
-        String password = "Dolfin.499";
+        String password = "*******"; //Add your own password!
         return DriverManager.getConnection(url, username, password);
     }
     public static void dropTables(Connection connection) throws SQLException {
